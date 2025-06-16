@@ -2,5 +2,6 @@ go 1.23.0
 
 use (
 	./account-version-example
+	./golang-sync-example
 	./hello-world
 )
