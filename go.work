@@ -3,6 +3,7 @@ go 1.23.0
 use (
 	./account-version-example
 	./golang-channel-example
+	./golang-slice-and-map-example
 	./golang-sync-example
 	./hello-world
 )
