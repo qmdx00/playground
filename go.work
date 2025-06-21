@@ -1,8 +1,9 @@
-go 1.23.0
+go 1.23.3
 
 use (
 	./account-version-example
 	./golang-channel-example
+	./golang-grpc-example
 	./golang-slice-and-map-example
 	./golang-sync-example
 	./hello-world
