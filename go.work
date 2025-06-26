@@ -8,4 +8,5 @@ use (
 	./golang-slice-and-map-example
 	./golang-sync-example
 	./hello-world
+	./rocketmq-golang-example
 )

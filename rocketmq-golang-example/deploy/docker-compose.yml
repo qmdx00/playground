@@ -1,0 +1,30 @@
+services:
+  namesrv:
+    image: apache/rocketmq:5.3.3
+    container_name: rmqnamesrv
+    ports:
+      - 9876:9876
+    networks:
+      - rocketmq
+    command: sh mqnamesrv
+
+  broker:
+    image: apache/rocketmq:5.3.3
+    container_name: rmqbroker
+    ports:
+      - 10909:10909
+      - 10911:10911
+      - 10912:10912
+    environment:
+      - NAMESRV_ADDR=rmqnamesrv:9876
+    volumes:
+      - ./broker.conf:/home/rocketmq/rocketmq-5.3.3/conf/broker.conf
+    depends_on:
+      - namesrv
+    networks:
+      - rocketmq
+    command: sh mqbroker -c /home/rocketmq/rocketmq-5.3.3/conf/broker.conf --enable-proxy
+
+networks:
+  rocketmq:
+    driver: bridge
