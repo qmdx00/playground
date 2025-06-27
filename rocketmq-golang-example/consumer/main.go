@@ -26,16 +26,6 @@ func main() {
 	pushConsumer(options)
 }
 
-func messageHandle(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
-	for _, msg := range msgs {
-		fmt.Printf("[RECV] QueueID=%d Offset=%d Body=[%s]\n",
-			msg.Queue.QueueId,
-			msg.QueueOffset,
-			msg.Body)
-	}
-	return consumer.ConsumeSuccess, nil
-}
-
 func pushConsumer(options []consumer.Option) {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
@@ -48,6 +38,16 @@ func pushConsumer(options []consumer.Option) {
 	selector := consumer.MessageSelector{
 		Type:       consumer.TAG,
 		Expression: config.MessageTag,
+	}
+
+	messageHandle := func(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
+		for _, msg := range msgs {
+			fmt.Printf("[RECV] QueueID=%d Offset=%d Body=[%s]\n",
+				msg.Queue.QueueId,
+				msg.QueueOffset,
+				msg.Body)
+		}
+		return consumer.ConsumeSuccess, nil
 	}
 
 	if err := c.Subscribe(config.MessageTopic, selector, messageHandle); err != nil {

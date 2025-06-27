@@ -25,6 +25,19 @@ services:
       - rocketmq
     command: sh mqbroker -c /home/rocketmq/rocketmq-5.3.3/conf/broker.conf --enable-proxy
 
+  # dashboard:
+  #   image: apacherocketmq/rocketmq-dashboard:latest
+  #   container_name: rmqboard
+  #   ports:
+  #     - 8081:8080
+  #   environment:
+  #     JAVA_OPTS: -Drocketmq.namesrv.addr=namesrv:9876
+  #   depends_on:
+  #     - namesrv
+  #     - broker
+  #   networks:
+  #     - rocketmq
+
 networks:
   rocketmq:
     driver: bridge
