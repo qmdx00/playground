@@ -1,0 +1,16 @@
+services:
+  emqx:
+    image: emqx/emqx-enterprise:5.10.0
+    container_name: emqx
+    networks:
+      - emqx-bridge
+    ports:
+      - 1883:1883
+      - 8083:8083
+      - 8084:8084
+      - 8883:8883
+      - 18083:18083
+
+networks:
+  emqx-bridge:
+    driver: bridge
