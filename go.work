@@ -7,6 +7,7 @@ use (
 	./golang-grpc-example
 	./golang-slice-and-map-example
 	./golang-sync-example
+	./golang-tcp-example
 	./hello-world
 	./mqtt-golang-example
 	./rocketmq-golang-example
