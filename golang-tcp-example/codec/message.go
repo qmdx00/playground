@@ -13,6 +13,8 @@ const headerLength uint32 = 4 // uint32 4 字节用于记录消息长度
 
 var byteOrder binary.ByteOrder = binary.BigEndian
 
+var debug bool = true
+
 type MessagePacket []byte
 
 func Encode(message string) (MessagePacket, error) {
@@ -28,8 +30,17 @@ func Encode(message string) (MessagePacket, error) {
 		return nil, err
 	}
 
-	fmt.Printf("[ENCODE: length=%d] bytes=%v\n", length, buffer.Bytes())
-	return buffer.Bytes(), nil
+	bts := buffer.Bytes()
+
+	if debug {
+		fmt.Println("======================= ENCODE BLOCK START ========================")
+		fmt.Printf("|| length=%d\n", length)
+		fmt.Printf("|| bytes=%v\n", bts)
+		fmt.Printf("|| bits=%08b\n", bts)
+		fmt.Println("======================= ENCODE BLOCK END ==========================")
+	}
+
+	return bts, nil
 }
 
 func Decode(reader io.Reader) (uint32, string, error) {
@@ -50,9 +61,16 @@ func Decode(reader io.Reader) (uint32, string, error) {
 	if _, err := buffer.Read(buffered); err != nil {
 		return 0, "", err
 	}
-	data := buffered[headerLength:]
+	data := string(buffered[headerLength:])
 
-	fmt.Printf("[DECODE: length=%d] data=%v\n", length, string(data))
+	if debug {
+		fmt.Println("======================= DECODE BLOCK START ========================")
+		fmt.Printf("|| length=%d\n", length)
+		fmt.Printf("|| bytes=%v\n", buffered)
+		fmt.Printf("|| bits=%08b\n", buffered)
+		fmt.Printf("|| data=%s\n", data)
+		fmt.Println("======================= DECODE BLOCK END ==========================")
+	}
 
 	return length, string(data), nil
 }
