@@ -8,6 +8,7 @@ use (
 	./golang-slice-and-map-example
 	./golang-sync-example
 	./golang-tcp-example
+	./golang-websocket-example
 	./hello-world
 	./mqtt-golang-example
 	./rocketmq-golang-example
