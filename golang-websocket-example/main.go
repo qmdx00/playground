@@ -45,6 +45,7 @@ func ServeWs(upgrader websocket.Upgrader, chatRoom *ChatRoom) func(w http.Respon
 		client := NewClient(clientID, conn)
 		client.Join(chatRoom)
 
+		go client.writeLoop()
 		go client.readLoop()
 	}
 }

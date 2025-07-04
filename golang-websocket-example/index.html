@@ -99,9 +99,20 @@
             var input = document.getElementById("input");
             var ws;
 
-            var print = function (message) {
+            var eventColors = {
+                "OPEN": "#ff9800",
+                "CLOSE": "#9e9e9e",
+                "ERROR": "#f44336",
+                "RECV": "#4caf50",
+                "SEND": "#2196f3",
+                "SYSTEM": "#f44336"
+            };
+
+            var print = function (event, message) {
                 var d = document.createElement("div");
-                d.textContent = message;
+                var timestamp = new Date().toLocaleTimeString();
+                d.textContent = timestamp + " " + message;
+                d.style.color = eventColors[event] || "#e0e0e0";
                 output.appendChild(d);
                 output.scroll(0, output.scrollHeight);
             };
@@ -112,17 +123,20 @@
                 }
                 ws = new WebSocket("ws://" + window.location.host + "/ws" + "?clientId=" + encodeURIComponent(document.getElementById("clientId").value));
                 ws.onopen = function (evt) {
-                    print("OPEN CONN");
+                    print("OPEN", "[OPEN CONN]");
                 }
                 ws.onclose = function (evt) {
-                    print("CLOSE CONN");
+                    print("CLOSE", "[CLOSE CONN]");
                     ws = null;
                 }
                 ws.onerror = function (evt) {
-                    print("ERROR: " + evt.data);
+                    print("ERROR", "[ERROR] --> " + evt.data);
                 }
                 ws.onmessage = function (evt) {
-                    print("[RECV] <== " + evt.data);
+                    message = JSON.parse(evt.data);
+                    var sender = message?.sender || "Unknown";
+                    var content = message?.content || "No content";
+                    print(sender === "SYSTEM" ? "SYSTEM" : "RECV", "[RECV] <== [" + sender + "] " + content);
                 }
                 return false;
             };
@@ -131,7 +145,7 @@
                 if (!ws) {
                     return false;
                 }
-                print("[SEND] ==> " + input.value);
+                print("SEND", "[SEND] ==> " + input.value);
                 ws.send(input.value);
                 return false;
             };

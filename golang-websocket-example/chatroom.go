@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"sync"
 )
@@ -31,7 +30,7 @@ func NewChatRoom(roomId string) *ChatRoom {
 		RoomId:     roomId,
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		broadcast:  make(chan Message, 100),
+		broadcast:  make(chan Message, bufferSize),
 		clients:    make(map[string]*Client),
 		mutex:      &sync.Mutex{},
 	}
@@ -51,7 +50,11 @@ func (cr *ChatRoom) Run() {
 
 		case client := <-cr.unregister:
 			cr.mutex.Lock()
-			delete(cr.clients, client.ID)
+			if _, ok := cr.clients[client.ID]; !ok {
+				close(client.sender)
+				delete(cr.clients, client.ID)
+				client.Close()
+			}
 			cr.mutex.Unlock()
 
 			cr.broadcast <- Message{Sender: SystemSender, Content: client.ID + " has left the chat"}
@@ -63,9 +66,12 @@ func (cr *ChatRoom) Run() {
 				if message.Sender == client.ID {
 					continue
 				}
-				if err := client.WriteMessage(fmt.Sprintf("[%s]: %s", message.Sender, message.Content)); err != nil {
+
+				select {
+				case client.sender <- message:
+				default:
+					log.Printf("[ERROR] Client %s's message channel is full, unregistering client", client.ID)
 					cr.unregister <- client
-					client.Close()
 				}
 			}
 		}
@@ -73,14 +79,19 @@ func (cr *ChatRoom) Run() {
 }
 
 func (cr *ChatRoom) RegisterClient(client *Client) {
+	cr.mutex.Lock()
+	defer cr.mutex.Unlock()
+
 	if client.ID == SystemSender {
-		client.WriteMessage("[ERROR] Client ID cannot be " + SystemSender)
+		message := Message{Sender: SystemSender, Content: "[ERROR] Client ID cannot be " + SystemSender}
+		client.JsonMessage(message)
 		client.Close()
 		return
 	}
 
 	if _, exists := cr.clients[client.ID]; exists {
-		client.WriteMessage("[ERROR] Client ID already exists")
+		message := Message{Sender: SystemSender, Content: "[ERROR] Client ID already exists"}
+		client.JsonMessage(message)
 		client.Close()
 		return
 	}
