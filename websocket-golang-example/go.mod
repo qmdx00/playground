@@ -1,4 +1,4 @@
-module golang-websocket-example
+module websocket-golang-example
 
 go 1.23.3
 

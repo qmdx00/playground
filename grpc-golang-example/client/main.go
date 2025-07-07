@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"flag"
-	pbproto "golang-grpc-example/proto"
+	pbproto "grpc-golang-example/proto"
 	"log"
 
 	"google.golang.org/grpc"
@@ -24,7 +24,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	client := pbproto.NewGreeterClient(conn)
+	client := pbproto.NewGreeterServiceClient(conn)
 
 	resp, err := client.SayHello(context.Background(), &pbproto.HelloRequest{Name: *name})
 	if err != nil {

@@ -1,17 +1,17 @@
 go 1.23.3
 
 use (
+	./hello-world
 	./account-version-example
 	./distributed-unique-id-example
 	./golang-channel-example
-	./golang-grafana-prometheus-example
-	./golang-grpc-example
 	./golang-slice-and-map-example
 	./golang-sync-example
 	./golang-tcp-example
 	./golang-unsafe-example
-	./golang-websocket-example
-	./hello-world
+	./grpc-golang-example
 	./mqtt-golang-example
+	./prometheus-golang-example
 	./rocketmq-golang-example
+	./websocket-golang-example
 )

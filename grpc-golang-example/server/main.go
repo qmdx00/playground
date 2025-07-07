@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	pbproto "golang-grpc-example/proto"
+	pbproto "grpc-golang-example/proto"
 	"log"
 	"net"
 
@@ -12,7 +12,7 @@ import (
 )
 
 type GreetServer struct {
-	pbproto.UnimplementedGreeterServer
+	pbproto.UnimplementedGreeterServiceServer
 }
 
 // SayHello implements helloworld.GreeterServer
@@ -36,7 +36,7 @@ func main() {
 
 	s := grpc.NewServer()
 
-	pbproto.RegisterGreeterServer(s, &GreetServer{})
+	pbproto.RegisterGreeterServiceServer(s, &GreetServer{})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

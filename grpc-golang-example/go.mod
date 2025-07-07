@@ -1,4 +1,4 @@
-module golang-grpc-example
+module grpc-golang-example
 
 go 1.23.0
 

@@ -1,4 +1,4 @@
-module golang-grafana-prometheus-example
+module prometheus-golang-example
 
 go 1.23.3
 
