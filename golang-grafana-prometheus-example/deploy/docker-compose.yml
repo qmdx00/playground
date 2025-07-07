@@ -1,0 +1,60 @@
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml # Mount Prometheus config
+      - prometheus_data:/prometheus # Persistent data volume
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - monitoring_network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana # Persistent data volume
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources # Provision data sources
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin # Default admin user
+      - GF_SECURITY_ADMIN_PASSWORD=admin # Default admin password
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring_network
+
+  node_exporter:
+    image: prom/node-exporter
+    container_name: node_exporter
+    ports:
+      - "9100:9100"
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - /:/host:ro,rslave
+    networks:
+      - monitoring_network
+
+  example_app:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    container_name: example_app
+    ports:
+      - "8080:8080"
+    networks:
+      - monitoring_network
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  monitoring_network:
+    driver: bridge

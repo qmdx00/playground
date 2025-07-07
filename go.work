@@ -4,6 +4,7 @@ use (
 	./account-version-example
 	./distributed-unique-id-example
 	./golang-channel-example
+	./golang-grafana-prometheus-example
 	./golang-grpc-example
 	./golang-slice-and-map-example
 	./golang-sync-example
