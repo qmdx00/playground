@@ -1,15 +1,16 @@
 go 1.23.3
 
 use (
-	./hello-world
 	./account-version-example
 	./distributed-unique-id-example
+	./ebiten-game-golang-example
 	./golang-channel-example
 	./golang-slice-and-map-example
 	./golang-sync-example
 	./golang-tcp-example
 	./golang-unsafe-example
 	./grpc-golang-example
+	./hello-world
 	./mqtt-golang-example
 	./prometheus-golang-example
 	./rocketmq-golang-example
