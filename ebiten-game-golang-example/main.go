@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -12,8 +13,6 @@ var _ ebiten.Game = (*Game)(nil)
 const (
 	screenWidth  = 640 / 2
 	screenHeight = 480 / 2
-
-	runnerFrameCount = 3
 )
 
 type Game struct {
@@ -32,28 +31,18 @@ func NewGame() *Game {
 
 // Update proceeds the game state.
 // Update is called every tick (1/60 [s] by default).
-func (g *Game) Update() error {
-	// Write your game's logical update.
+func (g *Game) Update() (err error) {
+	g.player.Update()
 
-	// keyboard controls
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		g.player.Update()
-		g.player.Move(g, Left)
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		g.player.Update()
-		g.player.Move(g, Right)
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		g.player.Update()
-		g.player.Move(g, Up)
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		g.player.Update()
-		g.player.Move(g, Down)
+	var event PlayerEvent = StopEvent
+	for key, _event := range KeyboardEventMap {
+		if ebiten.IsKeyPressed(key) {
+			event = _event
+		}
 	}
 
-	return nil
+	g.player.Transition(g, event)
+	return
 }
 
 // Draw draws the game screen.
@@ -62,9 +51,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 
 	op.GeoM.Translate(g.player.X, g.player.Y)
-	screen.DrawImage(g.player.Image(), op)
+	screen.Fill(color.RGBA{0xA0, 0xA0, 0xA0, 255})
+	screen.DrawImage(g.player.RenderImage(), op)
 
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("Use arrow keys to move the player.\nPosition: (%.2f, %.2f)", g.player.X, g.player.Y))
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("Use arrow keys to move the player.\nPosition: (%.2f, %.2f)\nState: %s", g.player.X, g.player.Y, g.player.fsm.currentState))
 }
 
 // Layout takes the outside size (e.g., the window size) and returns the (logical) screen size.

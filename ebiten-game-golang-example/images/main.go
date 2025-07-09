@@ -4,7 +4,12 @@ import (
 	_ "embed"
 )
 
+// Sprite images download from:
+// https://www.piskelapp.com/
+
 var (
-	//go:embed runner.png
-	Runner_png []byte
+	//go:embed run.png
+	Run_png []byte
+	//go:embed idle.png
+	Idle_png []byte
 )

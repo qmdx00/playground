@@ -1,44 +1,25 @@
 package main
 
 import (
-	"bytes"
-	"ebiten-game-golang-example/images"
-	"image"
-	"log"
-
 	"github.com/hajimehoshi/ebiten/v2"
-)
-
-type Direction int
-
-const (
-	Left Direction = iota
-	Right
-	Up
-	Down
 )
 
 type Player struct {
 	X, Y          float64
 	width, height int
-	image         *ebiten.Image
-	frame         int
 	step          float64
+
+	frame int
+	fsm   *FSM
 }
 
 func NewPlayer(x, y float64) *Player {
-	img, _, err := image.Decode(bytes.NewReader(images.Runner_png))
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	return &Player{
-		X:      x,
-		Y:      y,
-		width:  32,
-		height: 32,
-		image:  ebiten.NewImageFromImage(img),
-		step:   1.0, // step for animation
+		X: x, Y: y,
+		width: 32, height: 32,
+		step:  1.0,
+		frame: 0,
+		fsm:   NewPlayerFSM(PlayerStateIdle),
 	}
 }
 
@@ -46,24 +27,28 @@ func (p *Player) Update() {
 	// make player animation
 	// This function can be used to update player state,
 	// e.g., animation frames.
-
 	p.frame++
 }
 
-func (p *Player) Move(g *Game, direction Direction) {
+func (p *Player) Transition(g *Game, event PlayerEvent) {
 	var dx, dy float64
-
-	switch direction {
-	case Left:
+	switch event {
+	case MoveLeftEvent:
 		dx = -p.step
-	case Right:
+	case MoveRightEvent:
 		dx = p.step
-	case Up:
+	case MoveUpEvent:
 		dy = -p.step
-	case Down:
+	case MoveDownEvent:
 		dy = p.step
+	case StopEvent:
+	default:
 	}
 
+	// change player state
+	p.fsm.Transition(event)
+
+	// update player position
 	p.X += dx
 	p.Y += dy
 
@@ -81,9 +66,6 @@ func (p *Player) Move(g *Game, direction Direction) {
 	}
 }
 
-func (p *Player) Image() *ebiten.Image {
-	index := (p.frame / 5) % runnerFrameCount
-	sx, sy := 0, index*p.height
-	// fmt.Println("Player frame index:", index, "sx:", sx, "sy:", sy)
-	return p.image.SubImage(image.Rect(sx, sy, sx+p.width, sy+p.height)).(*ebiten.Image)
+func (p *Player) RenderImage() *ebiten.Image {
+	return p.fsm.currentState.Image(p.frame)
 }
