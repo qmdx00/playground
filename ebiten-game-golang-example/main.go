@@ -1,7 +1,7 @@
 package main
 
 import (
-	"image/color"
+	"fmt"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -9,31 +9,68 @@ import (
 
 var _ ebiten.Game = (*Game)(nil)
 
-type Game struct{}
+const (
+	screenWidth  = 640 / 2
+	screenHeight = 480 / 2
+
+	runnerFrameCount = 3
+)
+
+type Game struct {
+	player *Player
+
+	width, height int
+}
 
 func NewGame() *Game {
-	return &Game{}
+	return &Game{
+		player: NewPlayer(100, 100),
+		width:  screenWidth,
+		height: screenHeight,
+	}
 }
 
 // Update proceeds the game state.
 // Update is called every tick (1/60 [s] by default).
 func (g *Game) Update() error {
 	// Write your game's logical update.
+
+	// keyboard controls
+	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+		g.player.Update()
+		g.player.Move(g, Left)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyRight) {
+		g.player.Update()
+		g.player.Move(g, Right)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyUp) {
+		g.player.Update()
+		g.player.Move(g, Up)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyDown) {
+		g.player.Update()
+		g.player.Move(g, Down)
+	}
+
 	return nil
 }
 
 // Draw draws the game screen.
 // Draw is called every frame (typically 1/60[s] for 60Hz display).
 func (g *Game) Draw(screen *ebiten.Image) {
-	// Write your game's rendering.
-	screen.Fill(color.RGBA{0x00, 0xff, 0x00, 0xff}) // Fill the screen with green color
-	ebitenutil.DebugPrint(screen, "Hello, World!")
+	op := &ebiten.DrawImageOptions{}
+
+	op.GeoM.Translate(g.player.X, g.player.Y)
+	screen.DrawImage(g.player.Image(), op)
+
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("Use arrow keys to move the player.\nPosition: (%.2f, %.2f)", g.player.X, g.player.Y))
 }
 
 // Layout takes the outside size (e.g., the window size) and returns the (logical) screen size.
 // If you don't have to adjust the screen size with the outside size, just return a fixed size.
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return outsideWidth / 2, outsideHeight / 2
+	return g.width, g.height
 }
 
 func main() {
