@@ -11,18 +11,31 @@ var _ ebiten.Game = (*Game)(nil)
 
 const (
 	screenWidth  = 1000
-	screenHeight = 750
+	screenHeight = 740
+
+	unitWidth  = 32
+	unitHeight = 32
+
+	tileWidth  = 128
+	tileHeight = 128
+
+	playerScale float64 = 2
+	tileScale   float64 = 2
+
+	startX, startY = 0, screenHeight - 1.5*unitHeight*playerScale // player starts at the bottom left corner
 )
 
 type Game struct {
 	player *Player
+	scene  *SceneMap
 
 	width, height int
 }
 
 func NewGame() *Game {
 	return &Game{
-		player: NewPlayer(100, 100),
+		player: NewPlayer(startX, startY, unitWidth, unitHeight), // player size is 32x32
+		scene:  NewDefaultSceneMap(),
 		width:  screenWidth,
 		height: screenHeight,
 	}
@@ -47,12 +60,21 @@ func (g *Game) Update() (err error) {
 // Draw draws the game screen.
 // Draw is called every frame (typically 1/60[s] for 60Hz display).
 func (g *Game) Draw(screen *ebiten.Image) {
+	// Draw the background image
 	op := &ebiten.DrawImageOptions{}
+	bgBounds := backgroundImage.Bounds()
+	scaleX := float64(g.width) / float64(bgBounds.Dx())
+	scaleY := float64(g.height) / float64(bgBounds.Dy())
 
-	op.GeoM.Translate(g.player.X, g.player.Y)
-	// screen.Fill(color.RGBA{0xA0, 0xA0, 0xA0, 255})
-	screen.DrawImage(backgroundImage, nil)
-	screen.DrawImage(g.player.RenderImage(), op)
+	// scale image to fit the screen
+	op.GeoM.Scale(scaleX, scaleY)
+	screen.DrawImage(backgroundImage, op)
+
+	// Render the scene map
+	g.scene.Render(screen)
+
+	// Render the player
+	g.player.Render(screen)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("Use arrow keys to move the player.\nPosition: (%.2f, %.2f)\nState: %s", g.player.X, g.player.Y, g.player.fsm.currentState))
 }

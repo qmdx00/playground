@@ -17,6 +17,7 @@ var (
 
 	runFrameCount  = 8
 	idleFrameCount = 9
+	jumpFrameCount = 12
 )
 
 func init() {
@@ -37,22 +38,19 @@ type PlayerState string
 
 const (
 	PlayerStateIdle    PlayerState = "idle"
-	PlayerStateWalking PlayerState = "walking"
+	PlayerStateRunning PlayerState = "running"
 )
 
 type PlayerEvent string
 
 const (
-	MoveLeftEvent  PlayerEvent = "move_left"
 	MoveRightEvent PlayerEvent = "move_right"
-	MoveDownEvent  PlayerEvent = "move_down"
-	MoveUpEvent    PlayerEvent = "move_up"
 	StopEvent      PlayerEvent = "stop"
 )
 
 func (state PlayerState) Image(frame int) *ebiten.Image {
 	switch state {
-	case PlayerStateWalking:
+	case PlayerStateRunning:
 		index := (frame / 10) % runFrameCount
 		sx, sy := frameOX+index*frameWidth, frameOY
 		return runSpriteImage.SubImage(image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)).(*ebiten.Image)

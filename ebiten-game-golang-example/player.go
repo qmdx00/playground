@@ -13,13 +13,14 @@ type Player struct {
 	fsm   *FSM
 }
 
-func NewPlayer(x, y float64) *Player {
+func NewPlayer(x, y float64, width, height int) *Player {
 	return &Player{
 		X: x, Y: y,
-		width: 32, height: 32,
-		step:  1.0,
-		frame: 0,
-		fsm:   NewPlayerFSM(PlayerStateIdle),
+		width:  width,
+		height: height,
+		step:   1.0,
+		frame:  0,
+		fsm:    NewPlayerFSM(PlayerStateIdle),
 	}
 }
 
@@ -33,14 +34,8 @@ func (p *Player) Update() {
 func (p *Player) Transition(g *Game, event PlayerEvent) {
 	var dx, dy float64
 	switch event {
-	case MoveLeftEvent:
-		dx = -p.step
 	case MoveRightEvent:
 		dx = p.step
-	case MoveUpEvent:
-		dy = -p.step
-	case MoveDownEvent:
-		dy = p.step
 	case StopEvent:
 	default:
 	}
@@ -55,17 +50,20 @@ func (p *Player) Transition(g *Game, event PlayerEvent) {
 	// Ensure the player stays within the game boundaries
 	if p.X < 0 {
 		p.X = 0
-	} else if p.X+float64(p.width) > float64(g.width) {
-		p.X = float64(g.width) - float64(p.width)
+	} else if p.X+float64(p.width)*playerScale > float64(g.width) {
+		p.X = float64(g.width) - float64(p.width)*playerScale
 	}
 
 	if p.Y < 0 {
 		p.Y = 0
-	} else if p.Y+float64(p.height) > float64(g.height) {
-		p.Y = float64(g.height) - float64(p.height)
+	} else if p.Y+float64(p.height)*playerScale > float64(g.height) {
+		p.Y = float64(g.height) - float64(p.height)*playerScale
 	}
 }
 
-func (p *Player) RenderImage() *ebiten.Image {
-	return p.fsm.currentState.Image(p.frame)
+func (p *Player) Render(screen *ebiten.Image) {
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Scale(playerScale, playerScale)
+	op.GeoM.Translate(p.X, p.Y)
+	screen.DrawImage(p.fsm.currentState.Image(p.frame), op)
 }

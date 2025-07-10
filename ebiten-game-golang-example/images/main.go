@@ -1,6 +1,7 @@
 package images
 
 import (
+	"embed"
 	_ "embed"
 )
 
@@ -21,4 +22,7 @@ var (
 var (
 	//go:embed freetileset/Background/BG.png
 	Background_png []byte
+
+	//go:embed freetileset/Tiles/*
+	Tiles_png embed.FS
 )

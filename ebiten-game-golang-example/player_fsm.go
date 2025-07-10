@@ -16,24 +16,12 @@ func NewPlayerFSM(initialState PlayerState) *FSM {
 	return &FSM{
 		currentState: initialState,
 		transitions: map[PlayerEvent][]Transition{
-			MoveLeftEvent: {
-				{From: PlayerStateIdle, To: PlayerStateWalking, PlayerEvent: MoveLeftEvent},
-				{From: PlayerStateWalking, To: PlayerStateWalking, PlayerEvent: MoveLeftEvent},
-			},
 			MoveRightEvent: {
-				{From: PlayerStateIdle, To: PlayerStateWalking, PlayerEvent: MoveRightEvent},
-				{From: PlayerStateWalking, To: PlayerStateWalking, PlayerEvent: MoveRightEvent},
-			},
-			MoveDownEvent: {
-				{From: PlayerStateIdle, To: PlayerStateWalking, PlayerEvent: MoveDownEvent},
-				{From: PlayerStateWalking, To: PlayerStateWalking, PlayerEvent: MoveDownEvent},
-			},
-			MoveUpEvent: {
-				{From: PlayerStateIdle, To: PlayerStateWalking, PlayerEvent: MoveUpEvent},
-				{From: PlayerStateWalking, To: PlayerStateWalking, PlayerEvent: MoveUpEvent},
+				{From: PlayerStateIdle, To: PlayerStateRunning, PlayerEvent: MoveRightEvent},
+				{From: PlayerStateRunning, To: PlayerStateRunning, PlayerEvent: MoveRightEvent},
 			},
 			StopEvent: {
-				{From: PlayerStateWalking, To: PlayerStateIdle, PlayerEvent: StopEvent},
+				{From: PlayerStateRunning, To: PlayerStateIdle, PlayerEvent: StopEvent},
 			},
 		},
 	}
