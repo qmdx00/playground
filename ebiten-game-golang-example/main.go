@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -11,8 +10,8 @@ import (
 var _ ebiten.Game = (*Game)(nil)
 
 const (
-	screenWidth  = 640 / 2
-	screenHeight = 480 / 2
+	screenWidth  = 1000
+	screenHeight = 750
 )
 
 type Game struct {
@@ -51,7 +50,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 
 	op.GeoM.Translate(g.player.X, g.player.Y)
-	screen.Fill(color.RGBA{0xA0, 0xA0, 0xA0, 255})
+	// screen.Fill(color.RGBA{0xA0, 0xA0, 0xA0, 255})
+	screen.DrawImage(backgroundImage, nil)
 	screen.DrawImage(g.player.RenderImage(), op)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("Use arrow keys to move the player.\nPosition: (%.2f, %.2f)\nState: %s", g.player.X, g.player.Y, g.player.fsm.currentState))
@@ -66,7 +66,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 func main() {
 	game := NewGame()
 
-	ebiten.SetWindowSize(640, 480)
+	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("My First Ebiten Game")
 
 	if err := ebiten.RunGame(game); err != nil {

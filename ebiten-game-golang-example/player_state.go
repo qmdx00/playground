@@ -10,9 +10,6 @@ import (
 )
 
 var (
-	runSpriteImage  *ebiten.Image
-	idleSpriteImage *ebiten.Image
-
 	frameOX     = 0
 	frameOY     = 0
 	frameWidth  = 32
