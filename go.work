@@ -3,7 +3,6 @@ go 1.23.3
 use (
 	./account-version-example
 	./distributed-unique-id-example
-	./ebiten-game-golang-example
 	./golang-channel-example
 	./golang-slice-and-map-example
 	./golang-sync-example
